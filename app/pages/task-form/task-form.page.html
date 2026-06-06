@@ -1,0 +1,55 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tasks" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Edit Task' : 'New Task' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="form-content">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="field-card">
+      <ion-item lines="none">
+        <ion-input
+          label="Title"
+          labelPlacement="stacked"
+          formControlName="title"
+          placeholder="What needs to be done?"
+          [counter]="true"
+          maxlength="120"
+        ></ion-input>
+      </ion-item>
+    </div>
+    @if (title?.invalid && title?.touched) {
+      <p class="field-error">Please enter a title.</p>
+    }
+
+    <div class="field-card">
+      <ion-item lines="none">
+        <ion-textarea
+          label="Description"
+          labelPlacement="stacked"
+          formControlName="description"
+          placeholder="Add some details (optional)…"
+          [autoGrow]="true"
+          [counter]="true"
+          maxlength="500"
+          rows="2"
+        ></ion-textarea>
+      </ion-item>
+    </div>
+
+    <ion-button
+      type="button"
+      expand="block"
+      shape="round"
+      class="save-btn"
+      [disabled]="form.invalid"
+      (click)="save()"
+    >
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      {{ isEdit ? 'Update Task' : 'Create Task' }}
+    </ion-button>
+  </form>
+</ion-content>

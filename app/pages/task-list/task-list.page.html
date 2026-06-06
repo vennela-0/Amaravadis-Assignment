@@ -1,0 +1,79 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>My Tasks</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="sync()"
+        [disabled]="(isOnline$ | async) === false || (isSyncing$ | async)"
+        aria-label="Sync now"
+      >
+        <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="sync($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Hero / summary card -->
+  <section class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>
+          {{ pendingCount$ | async }}
+          <span>task(s) to do</span>
+        </h1>
+      </div>
+      <app-status-badge
+        [online]="(isOnline$ | async) ?? false"
+        [syncing]="(isSyncing$ | async) ?? false"
+      ></app-status-badge>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="num">{{ totalCount$ | async }}</span>
+        <span class="cap">Total</span>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <span class="num done">{{ doneCount$ | async }}</span>
+        <span class="cap">Completed</span>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <span class="num pending">{{ pendingCount$ | async }}</span>
+        <span class="cap">Pending Sync</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Task list -->
+  @if ((visibleTasks$ | async)?.length) {
+    <ion-list class="task-list" lines="none">
+      @for (task of visibleTasks$ | async; track trackById($index, task)) {
+        <app-task-item
+          [task]="task"
+          (edit)="editTask($event)"
+          (remove)="confirmDelete($event)"
+        ></app-task-item>
+      }
+    </ion-list>
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="checkmark-circle"></ion-icon>
+      <h2>All clear!</h2>
+      <p>Tap the + button to create your first task.</p>
+    </div>
+  }
+
+  <!-- Add task FAB -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addTask()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
